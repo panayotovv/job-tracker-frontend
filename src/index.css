@@ -1,0 +1,10 @@
+@import "tailwindcss";
+
+body {
+  font-family: 'Outfit', sans-serif;
+}
+
+html, body {
+    overscroll-behavior: none;
+}
+
