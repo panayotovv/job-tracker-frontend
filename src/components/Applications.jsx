@@ -8,7 +8,6 @@ const STATUS_OPTIONS = [
     { label: "Interview scheduled", icon: "📅", color: "indigo"  },
     { label: "Offer received",      icon: "🎉", color: "violet"  },
     { label: "Rejected",            icon: "✕",  color: "red"     },
-    { label: "Withdrawn",           icon: "−",  color: "slate"   },
 ];
 
 const statusStyles = {
