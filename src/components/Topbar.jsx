@@ -81,7 +81,7 @@ export default function Topbar({ onOpenAuth, search, setSearch, user, jobCount, 
               />
                 </div>
             ) : (
-                <svg width="32" height="32" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg" className="rounded-full border-[1.5px] border-indigo-500/40 group-hover:border-indigo-500/80 transition-colors duration-200">
+                <svg width="32" height="32" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg" className="rounded-full border-[1.5px] border-indigo-500/40 group-hover:border-indigo-500/80 transition-colors duration-200" onClick={() => navigate("/profile")}>
                     <rect width="32" height="32" rx="16" fill="url(#grad)"/>
                     <circle cx="16" cy="13" r="5" fill="rgba(255,255,255,0.85)"/>
                     <path d="M6 26c0-5.523 4.477-9 10-9s10 3.477 10 9" fill="rgba(255,255,255,0.85)"/>

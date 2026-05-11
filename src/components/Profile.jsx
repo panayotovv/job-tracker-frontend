@@ -36,9 +36,6 @@ function getLast7DayLabels() {
   return labels;
 }
 
-// Step tracker — each stage is a node connected by a line.
-// Active = has at least 1. The furthest active stage glows.
-// Rejected is shown separately below as a warning node if non-zero.
 function PipelineStepTracker({ applied, interviews, offers, rejected }) {
   const stages = [
     { label: "Applied",   count: applied,    color: "#818cf8", dimColor: "rgba(129,140,248,0.15)" },
@@ -46,13 +43,11 @@ function PipelineStepTracker({ applied, interviews, offers, rejected }) {
     { label: "Offer",     count: offers,     color: "#fbbf24", dimColor: "rgba(251,191,36,0.15)"  },
   ];
 
-  // Find furthest active stage index
   let activeIdx = -1;
   stages.forEach((s, i) => { if (s.count > 0) activeIdx = i; });
 
   return (
-    <div className="flex flex-col gap-4 he">
-      {/* Connected nodes */}
+    <div className="flex flex-col gap-4">
       <div className="flex items-center w-full">
         {stages.map((s, i) => {
           const isActive = s.count > 0;
@@ -61,9 +56,7 @@ function PipelineStepTracker({ applied, interviews, offers, rejected }) {
 
           return (
             <div key={i} className="flex items-center" style={{ flex: i < stages.length - 1 ? "1" : "0 0 auto" }}>
-              {/* Node */}
               <div className="flex flex-col items-center gap-1.5" style={{ minWidth: 52 }}>
-                {/* Circle */}
                 <div
                   style={{
                     width: 36,
@@ -89,7 +82,6 @@ function PipelineStepTracker({ applied, interviews, offers, rejected }) {
                     {s.count}
                   </span>
                 </div>
-                {/* Label */}
                 <span
                   style={{
                     fontSize: 10,
@@ -104,7 +96,6 @@ function PipelineStepTracker({ applied, interviews, offers, rejected }) {
                 </span>
               </div>
 
-              {/* Connector line between nodes */}
               {i < stages.length - 1 && (
                 <div
                   style={{
@@ -123,7 +114,6 @@ function PipelineStepTracker({ applied, interviews, offers, rejected }) {
         })}
       </div>
 
-      {/* Rejected pill — only shown if non-zero */}
       {rejected > 0 && (
         <div
           style={{
@@ -151,12 +141,46 @@ export default function Profile({ user, onOpenEditProfile }) {
   const [stats, setStats] = useState({});
   const [weeklyData, setWeeklyData] = useState([]);
   const [interviews, setInterviews] = useState([]);
+  const [avatarPreview, setAvatarPreview] = useState(null);
 
   useEffect(() => {
     apiFetch("/users/applications/stats").then(setStats).catch(console.error);
     apiFetch("/users/applications/weekly").then(setWeeklyData).catch(console.error);
     apiFetch("/users/applications/interviews").then(setInterviews).catch(console.error);
   }, []);
+
+  async function handleAvatarChange(e) {
+    const file = e.target.files?.[0];
+
+    if (!file) return;
+
+    const previewUrl = URL.createObjectURL(file);
+    setAvatarPreview(previewUrl);
+
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+
+      const res = await fetch("http://127.0.0.1:8000/users/avatar", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token") || ""}`,
+        },
+        body: formData,
+      });
+      console.log(user.image)
+
+      if (!res.ok) {
+        throw new Error("Upload failed");
+      }
+
+      const data = await res.json();
+
+      setAvatarPreview(data.image);
+    } catch (err) {
+      console.error(err);
+    }
+  }
 
   const dayLabels = getLast7DayLabels();
   const applications =
@@ -233,12 +257,19 @@ export default function Profile({ user, onOpenEditProfile }) {
     <div className="min-h-full bg-[#0a0f1e] py-6">
       <div className="max-w-4xl mx-auto px-6 flex flex-col gap-4">
 
-        {/* Profile Card */}
         <div className="bg-[#111827] border border-indigo-500/10 rounded-2xl overflow-hidden">
           <div className="flex items-start gap-5 p-6 pb-4">
-            <div className="w-16 h-16 rounded-full border-2 border-indigo-500/30 flex-shrink-0 overflow-hidden">
-              {user?.image ? (
-                <img src={user.image} alt="avatar" className="w-full h-full object-cover" />
+
+            <label
+              htmlFor="avatar-upload"
+              className="w-16 h-16 rounded-full border-2 border-indigo-500/30 flex-shrink-0 overflow-hidden relative cursor-pointer group"
+            >
+              {avatarPreview || user?.image ? (
+                <img
+                  src={avatarPreview || user.image}
+                  alt="avatar"
+                  className="w-full h-full object-cover"
+                />
               ) : (
                 <svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg" className="w-full h-full">
                   <rect width="64" height="64" fill="#1e1b4b" />
@@ -246,7 +277,23 @@ export default function Profile({ user, onOpenEditProfile }) {
                   <path d="M8 56c0-11.6 10.7-20 24-20s24 8.4 24 20" fill="rgba(255,255,255,0.82)" />
                 </svg>
               )}
-            </div>
+
+              <div className="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" />
+                  <circle cx="12" cy="13" r="4" />
+                </svg>
+              </div>
+
+              <input
+                id="avatar-upload"
+                type="file"
+                accept="image/*"
+                className="hidden"
+                onChange={handleAvatarChange}
+              />
+            </label>
+
             <div className="flex-1 min-w-0">
               <div className="text-[18px] font-bold text-slate-200 tracking-tight">
                 {user?.full_name || user?.username || "—"}
@@ -317,10 +364,7 @@ export default function Profile({ user, onOpenEditProfile }) {
           </div>
         </div>
 
-        {/* Charts Row */}
         <div className="grid grid-cols-[1.4fr_1fr] gap-4">
-
-          {/* Line Chart */}
           <div className="bg-[#111827] border border-indigo-500/10 rounded-2xl p-5">
             <p className="text-[10.5px] text-slate-600 uppercase tracking-widest font-medium mb-4">
               Applications · last 7 days
@@ -336,7 +380,6 @@ export default function Profile({ user, onOpenEditProfile }) {
             )}
           </div>
 
-          {/* Pipeline Stacked Bar */}
           <div className="bg-[#111827] border border-indigo-500/10 rounded-2xl p-5">
             <div className="flex items-center justify-between mb-4">
               <p className="text-[10.5px] text-slate-600 uppercase tracking-widest font-medium">
@@ -352,7 +395,6 @@ export default function Profile({ user, onOpenEditProfile }) {
           </div>
         </div>
 
-        {/* Upcoming Interviews */}
         <div className="bg-[#111827] border border-indigo-500/10 rounded-2xl overflow-hidden">
           <div className="flex items-center justify-between px-5 pt-4 pb-2.5">
             <p className="text-[10.5px] text-slate-600 uppercase tracking-widest font-medium">
