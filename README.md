@@ -25,6 +25,7 @@ Your profile page gives you an overview of your job search activity — applicat
 ## 🖥️ Screenshots
 ![Dashboard](src/screenshots/dashboard.png)
 ![Applications](src/screenshots/applications.png)
+![Profile](src/screenshots/profile.png)
 
 ## 📖 Usage
 Sign up or log in to access your dashboard.
