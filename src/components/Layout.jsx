@@ -8,7 +8,9 @@ export default function DashboardLayout({
   search,
   setSearch,
   user,
-  setUser
+  setUser,
+  collapsed,
+  setCollapsed,
 }) {
   const [stats, setStats] = useState({ total: 0, new_today: 0 });
 
@@ -20,13 +22,20 @@ export default function DashboardLayout({
 
   return (
     <div className="flex h-screen">
+
       <Sidebar
         onOpenAuth={onOpenAuth}
         user={user}
         setUser={setUser}
+        collapsed={collapsed}
+        setCollapsed={setCollapsed}
       />
 
-      <main className="flex-1 ml-60 overflow-y-auto">
+      <main
+        className={`flex-1 overflow-y-auto transition-all duration-300 ${
+          collapsed ? "ml-16" : "ml-60"
+        }`}
+      >
         <Topbar
           search={search}
           setSearch={setSearch}
@@ -35,6 +44,8 @@ export default function DashboardLayout({
           setUser={setUser}
           jobCount={stats.total}
           newToday={stats.new_today}
+          collapsed={collapsed}
+          setCollapsed={setCollapsed}
         />
 
         <Outlet />

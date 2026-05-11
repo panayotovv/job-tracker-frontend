@@ -16,6 +16,7 @@ function App() {
   const [isSignUp, setIsSignUp] = useState(false);
   const [user, setUser] = useState(null);
   const [editProfileOpen, setEditProfileOpen] = useState(false);
+  const [collapsed, setCollapsed] = useState(false);
 
   const getUser = async () => {
     const meRes = await authFetch("http://127.0.0.1:8000/users/me");
@@ -47,7 +48,7 @@ function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<DashboardLayout onOpenAuth={onOpenAuth} search={search} setSearch={setSearch} user={user} setUser={setUser} />}>
+        <Route path="/" element={<DashboardLayout onOpenAuth={onOpenAuth} search={search} setSearch={setSearch} user={user} setUser={setUser} collapsed={collapsed} setCollapsed={setCollapsed} />}>
           <Route index element={<Dashboard search={search} user={user} />} />
           <Route path="applications" element={<Applications search={search} user={user} />} />
           <Route path="interviews" element={<Interviews search={search} user={user} />} />

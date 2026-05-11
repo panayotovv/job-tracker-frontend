@@ -4,6 +4,10 @@ body {
   font-family: 'Outfit', sans-serif;
 }
 
+* {
+  cursor: url("assets/cursor.png"), auto;
+}
+
 html, body {
     overscroll-behavior: none;
 }
