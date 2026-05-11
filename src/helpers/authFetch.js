@@ -12,7 +12,7 @@ export async function authFetch(url, options = {}) {
   if (res.status === 401) {
     localStorage.removeItem("token");
 
-    window.location.reload(); // simple but effective for now
+    window.location.reload(); 
 
     throw new Error("Unauthorized");
   }
